@@ -3,3 +3,7 @@
 *.orig
 
 *.sw*
+
+ebin/
+.ebin/
+.rebar/
