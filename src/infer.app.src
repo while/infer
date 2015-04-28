@@ -1,0 +1,14 @@
+{application, infer,
+ [
+  {description, "An Erlang infer library"},
+  {vsn, "1"},
+  {modules, [
+             infer
+            ]},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, []}
+ ]}.
