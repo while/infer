@@ -9,6 +9,7 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
+-include("src/erf.erl").
 
 % ------------------------------------------------------------------------------
 %  lognpdf - Log-Normal probability density function
@@ -31,34 +32,9 @@ logninv(P,_,_) when P < 0 orelse P > 1 -> {error,"Invalid probability"};
 logninv(P,Mu,Sig) ->
         math:exp(-1.41421356237309505*Sig*inverfc(2.0*P)+Mu).
 
-% ------------------------------------------------------------------------------
-%  Complementary error function 
-% ------------------------------------------------------------------------------
-erfc(X) -> 
-        1 - math:erf(X).
-
-% ------------------------------------------------------------------------------
-%  Inverse complementary error function
-% ------------------------------------------------------------------------------
-inverfc(P) when P >= 2 -> -100;
-inverfc(P) when P =< 0 ->  100;
-inverfc(P) ->
-        PP = if P <  1 -> P
-              ; P >= 1 -> 2 - P
-             end,
-        T = math:sqrt(-2*math:log(PP/2)),
-        X0 = -0.70711*((2.30753+T*0.27061)/(1+T*(0.99229+T*0.04481)) - T),
-        Err1 = erfc(X0) - PP,
-        X1 = X0 + Err1/(1.12837916709551257*math:exp(-X0*X0)-X0*Err1),
-        Err2 = erfc(X1) - PP,
-        X2 = X1 + Err2/(1.12837916709551257*math:exp(-X1*X1)-X1*Err2),
-        if P <  1 -> X2
-         ; P >= 1 -> -X2
-        end.
-
 
 % ==============================================================================
-%  Tests
+%  EUnit tests
 % ------------------------------------------------------------------------------
 -ifdef(TEST).
 
@@ -85,18 +61,5 @@ logninv_test() ->
         ?assertEqual(0.27760624185200977, logninv(0.1,0,1)),
         ?assertEqual(1.0, logninv(0.5,0,1)),
         ?assertEqual(1.6894457434840042, logninv(0.7,0,1)).
-
-erfc_test() ->
-        ?assertEqual(0.0, erfc(100)),
-        ?assertEqual(1.0, erfc(0)),
-        ?assertEqual(2.0, erfc(-100)).
-
-
-inverfc_test() ->
-        ?assertEqual(100, inverfc(0)),
-        ?assertEqual(0.3708071585935579, inverfc(0.6)),
-        ?assert(1.0e-16 >= inverfc(1)),
-        ?assertEqual(-0.3708071585935579, inverfc(1.4)),
-        ?assertEqual(-100, inverfc(2)).
 
 -endif.
