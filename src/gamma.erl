@@ -13,6 +13,8 @@
 % ------------------------------------------------------------------------------
 %  gammapdf - Uniform probability density function
 % ------------------------------------------------------------------------------
+gammapdf(_,Shape,_) when Shape =< 0 -> {error,"Shape parameter =< 0."};
+gammapdf(_,_,Rate) when Rate =< 0 -> {error,"Rate parameter =< 0."};
 gammapdf(X,_,_) when X < 0 -> 0.0;
 gammapdf(X,Shape,Rate) ->
         not_implemented.
@@ -20,6 +22,8 @@ gammapdf(X,Shape,Rate) ->
 % ------------------------------------------------------------------------------
 %  gammapcdf - Uniform cumulative distribution function
 % ------------------------------------------------------------------------------
+gammacdf(_,Shape,_) when Shape =< 0 -> {error,"Shape parameter =< 0."};
+gammacdf(_,_,Rate) when Rate =< 0 -> {error,"Rate parameter =< 0."};
 gammacdf(X,_,_) when X < 0 -> 0.0;
 gammacdf(X,Shape,Rate) ->
         not_implemented.
@@ -28,6 +32,8 @@ gammacdf(X,Shape,Rate) ->
 % ------------------------------------------------------------------------------
 %  gammapinv - Inverse gamma distribution function
 % ------------------------------------------------------------------------------
+gammainv(_,Shape,_) when Shape =< 0 -> {error,"Shape parameter =< 0."};
+gammainv(_,_,Rate) when Rate =< 0 -> {error,"Rate parameter =< 0."};
 gammainv(P,_,_) when P < 0 orelse P > 1 -> {error,"Invalid probability"};
 gammainv(P,Shape,Rate) ->
         not_implemented.
@@ -44,7 +50,7 @@ gammapdf_test() ->
 
 
 gammacdf_test() ->
-        ?assertEqual(0.0, gammacdf(0.0,1,1)),
+        ?assertEqual(0.0, gammacdf(0.0,1,1)).
 
 gammainv_test() ->
         ?assertEqual(0.0, gammainv(0.0,1,1)).
