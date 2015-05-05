@@ -46,6 +46,8 @@ gaminv(P,Alpha,Beta) ->
 % ------------------------------------------------------------------------------
 %  Gamma functions
 % ------------------------------------------------------------------------------
+
+%%
 gammaln(X) when X =< 0.0 -> {error, "Bad arg to gammln."};
 gammaln(X) -> 
         Coef = [ 57.1562356658629235,    -59.5979603554754912, 
@@ -62,7 +64,68 @@ gammaln(X) ->
         Ser = lists:sum([0.999999999999997092|[C/Y || {C,Y} <- lists:zip(Coef,Ys)]]),
         Tmp2+math:log(2.5066282746310005*Ser/X).
 
-gammap(_,_) -> not_implemented.
+%%
+gammap(A,X) when X =< 0 orelse A =< 0 -> {error, "Bad args in gammap."};
+gammap(_,0.0) -> 0.0;
+gammap(A,X) when A >= 100 -> gammapapprox(A,X,1),
+gammap(A,X) when X =< A + 1.0 -> gser(A,X),
+gammap(A,X) -> 1.0 - gcf(A,X).
+
+
+%%
+gser(A,X) -> gser_(A, X, A, 1.0/A, 1.0/A).
+
+%% Tail recusrion for gser
+gser_(A,X,_,Del,Sum) when abs(Del) < abs(Sum)*1.0e-16 -> 
+        Sum*math:exp(-X+A*math:log(X)-gammaln(A)),
+gser_(A,X,Ap,Del,Sum) ->
+        gser_(A, X, Ap+1, Del*X/Ap, Sum+Del).
+
+
+
+gcf(A,X) -> n.
+
+
+%% Abscissas for Gauss-Legendre quadrature
+gauleg18_y() ->
+        [ 0.0021695375159141994, 0.011413521097787704, 0.027972308950302116,
+          0.051727015600492421,  0.082502225484340941, 0.12007019910960293,
+          0.16415283300752470,   0.21442376986779355,  0.27051082840644336,
+          0.33199876341447887,   0.39843234186401943,  0.46931971407375483,
+          0.54413605556657973,   0.62232745288031077,  0.70331500465597174,
+          0.78649910768313447,   0.87126389619061517,  0.95698180152629142 ].
+
+%% Abscissas for Gauss-Legendre quadrature
+gauleg18_w() -> 
+        [ 0.0055657196642445571, 0.012915947284065419, 0.020181515297735382,
+          0.027298621498568734,  0.034213810770299537, 0.040875750923643261,
+          0.047235083490265582,  0.053244713977759692, 0.058860144245324798,
+          0.064039797355015485,  0.068745323835736408, 0.072941885005653087,
+          0.076598410645870640,  0.079687828912071670, 0.082187266704339706,
+          0.084078218979661945,  0.085346685739338721,0.085983275670394821 ].
+
+%% Approximate incomplete gamma function by Gauss-Legendre quadrature
+gammapapprox(A,X,Psig) ->
+        A1 = a-1.0,
+        LnA1 = math:log(A1),
+        SqrtA1 = math:sqrt(A1),
+        Gln = gammaln(A),
+        Xu = if X >  A1 -> max(A1 + 11.5*SqrtA1, X + 6.0*SqrtA1)
+              ; X =< A1 -> max(0.0, min(A1 - 7.5*SqrtA1, X - 5.0*SqrtA1))
+             end,
+        Ts = [X + (Xu-X)*Y || Y <- gauleg18_y()],
+        Sum = lists:sum([W*math:exp(-(T-A1) + A1*(math:log(T)-LnA1))) || {W,T} <- lists:zip(gauleg18_w(),Ts)]),
+        Ans = Sum*(Xu-X)*math:exp(A1*(LnA1-1.0) - Gln),
+        case Psig of
+                1 -> if Ans >  0.0 -> 1.0 - Ans
+                      ; Ans =< 0.0 -> -Ans
+                     end;
+                0 -> if Ans >= 0.0 -> Ans
+                      ; Ans <  0.0 -> 1.0 + Ans
+                     end
+        end.
+
+
 invgammap(_,_) -> not_implemented.
 
 % ==============================================================================
