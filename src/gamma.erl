@@ -47,7 +47,7 @@ gaminv(P,Alpha,Beta) ->
 %  Gamma functions
 % ------------------------------------------------------------------------------
 
-%%
+%% Natural logarithm of Gamma function
 gammaln(X) when X =< 0.0 -> {error, "Bad arg to gammln."};
 gammaln(X) -> 
         Coef = [ 57.1562356658629235,    -59.5979603554754912, 
@@ -64,26 +64,26 @@ gammaln(X) ->
         Ser = lists:sum([0.999999999999997092|[C/Y || {C,Y} <- lists:zip(Coef,Ys)]]),
         Tmp2+math:log(2.5066282746310005*Ser/X).
 
-%%
+%% Incomplete Gamma function
 gammap(A,X) when X =< 0 orelse A =< 0 -> {error, "Bad args in gammap."};
 gammap(_,0.0) -> 0.0;
-gammap(A,X) when A >= 100 -> gammapapprox(A,X,1),
-gammap(A,X) when X =< A + 1.0 -> gser(A,X),
+gammap(A,X) when A >= 100 -> gammapapprox(A,X,1);
+gammap(A,X) when X =< A + 1.0 -> gser(A,X);
 gammap(A,X) -> 1.0 - gcf(A,X).
 
 
-%%
+%% Series
 gser(A,X) -> gser_(A, X, A, 1.0/A, 1.0/A).
 
 %% Tail recusrion for gser
 gser_(A,X,_,Del,Sum) when abs(Del) < abs(Sum)*1.0e-16 -> 
-        Sum*math:exp(-X+A*math:log(X)-gammaln(A)),
+        Sum*math:exp(-X+A*math:log(X)-gammaln(A));
 gser_(A,X,Ap,Del,Sum) ->
         gser_(A, X, Ap+1, Del*X/Ap, Sum+Del).
 
 
-
-gcf(A,X) -> n.
+%%
+gcf(_,_) -> not_implemented.
 
 
 %% Abscissas for Gauss-Legendre quadrature
@@ -106,7 +106,7 @@ gauleg18_w() ->
 
 %% Approximate incomplete gamma function by Gauss-Legendre quadrature
 gammapapprox(A,X,Psig) ->
-        A1 = a-1.0,
+        A1 = A-1.0,
         LnA1 = math:log(A1),
         SqrtA1 = math:sqrt(A1),
         Gln = gammaln(A),
@@ -114,7 +114,7 @@ gammapapprox(A,X,Psig) ->
               ; X =< A1 -> max(0.0, min(A1 - 7.5*SqrtA1, X - 5.0*SqrtA1))
              end,
         Ts = [X + (Xu-X)*Y || Y <- gauleg18_y()],
-        Sum = lists:sum([W*math:exp(-(T-A1) + A1*(math:log(T)-LnA1))) || {W,T} <- lists:zip(gauleg18_w(),Ts)]),
+        Sum = lists:sum([W*math:exp(-(T-A1) + A1*(math:log(T)-LnA1)) || {W,T} <- lists:zip(gauleg18_w(),Ts)]),
         Ans = Sum*(Xu-X)*math:exp(A1*(LnA1-1.0) - Gln),
         case Psig of
                 1 -> if Ans >  0.0 -> 1.0 - Ans
@@ -144,12 +144,12 @@ gampdf_test() ->
         ?assertEqual(0.5413411329464507, gampdf(1.0,2,2)).
 
 gamcdf_test() ->
-        ?assertEqual(0.0, gamcdf(0.0,1,1)).
+        ?assertEqual(0.0, gamcdf(0.0,1,1)),
+        ?assertEqual(0.5132987982791589, gamcdf(100,100,1)),
+        ?assertEqual(0.124781215032525, gamcdf(15,20,1)).
 
 %gaminv_test() ->
 %        ?assertEqual(0.0, gaminv(0.0,1,1)).
-
-
 
 -endif.
 
