@@ -22,7 +22,7 @@ exppdf(X,Lambda) ->
 %  expcdf - Uniform cumulative distribution function
 % ------------------------------------------------------------------------------
 expcdf(_,Lambda) when Lambda =< 0 -> {error, "Lambda is smaller than zero."};
-expcdf(X,Lambda) when X < 0 -> 0.0;
+expcdf(X,_) when X < 0 -> 0.0;
 expcdf(X,Lambda) ->
         1-math:exp(-Lambda*X).
         
@@ -30,7 +30,7 @@ expcdf(X,Lambda) ->
 %  expinv - Inverse exponential distribution function
 % ------------------------------------------------------------------------------
 expinv(_,Lambda) when Lambda =< 0 -> {error, "Lambda is smaller than zero."};
-expinv(P,Lambda) when P < 0 orelse P > 1 -> {error,"Invalid probability"};
+expinv(P,_) when P < 0 orelse P > 1 -> {error,"Invalid probability"};
 expinv(P,Lambda) ->
         -math:log(1-P)/Lambda.
 
@@ -49,6 +49,8 @@ exppdf_test() ->
         ?assertEqual(4.5399929762484856e-04, exppdf(1,10)),
         ?assertEqual(3.720075976020836e-43, exppdf(10,10)).
 
+exppdf_error_test() ->
+        ?assertEqual({error,"Lambda is smaller than zero."}, exppdf(1.0,-1)).
 
 expcdf_test() ->
         ?assertEqual(0.0, expcdf(-1.0,10)),
@@ -59,11 +61,19 @@ expcdf_test() ->
         ?assertEqual(0.9999546000702375, expcdf(1.0,10)),
         ?assertEqual(1.0, expcdf(10.0,10)).
 
+expcdf_error_test() ->
+        ?assertEqual({error,"Lambda is smaller than zero."}, expcdf(1.0,-1)).
+
 expinv_test() ->
         ?assertEqual(0.0, expinv(0.0,10)),
         ?assertEqual(0.010536051565782628, expinv(0.1,10)),
         ?assertEqual(0.06931471805599453, expinv(0.5,10)),
         ?assertEqual(0.1203972804325936, expinv(0.7,10)).
+
+expinv_error_test() ->
+        ?assertEqual({error,"Lambda is smaller than zero."}, expinv(1.0,-1)),
+        ?assertEqual({error,"Invalid probability"}, expinv(-0.1,10)),
+        ?assertEqual({error,"Invalid probability"}, expinv(1.1,10)).
 
 -endif.
 

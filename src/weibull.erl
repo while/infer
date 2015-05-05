@@ -49,8 +49,8 @@ weibullpdf_test() ->
         ?assertEqual(0.009652270681138546, weibullpdf(2.5,2,1)),
         ?assertEqual(0.0007404588245200774, weibullpdf(3.0,2,1)).
 
-
 weibullcdf_test() ->
+        ?assertEqual(0.0, weibullcdf(-1.0,2,1)),
         ?assertEqual(0.0, weibullcdf(0.0,2,1)),
         ?assertEqual(0.22119921692859512, weibullcdf(0.5,2,1)),
         ?assertEqual(0.6321205588285577, weibullcdf(1.0,2,1)),
@@ -66,6 +66,9 @@ weibullinv_test() ->
         ?assertEqual(1.0972569454443821, weibullinv(0.7,2,1)),
         ?assertEqual(1.5174271293851465, weibullinv(0.9,2,1)).
 
+weibullinv_error_test() ->
+        ?assertEqual({error,"Invalid probability"}, weibullinv(-0.1,0,10)),
+        ?assertEqual({error,"Invalid probability"}, weibullinv(1.1,0,10)).
 -endif.
 
 

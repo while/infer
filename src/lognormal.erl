@@ -99,4 +99,8 @@ inverfc_test() ->
         ?assertEqual(-0.3708071585935579, inverfc(1.4)),
         ?assertEqual(-100, inverfc(2)).
 
+logninv_error_test() ->
+        ?assertEqual({error,"Invalid probability"}, logninv(-0.1,0,10)),
+        ?assertEqual({error,"Invalid probability"}, logninv(1.1,0,10)).
+
 -endif.

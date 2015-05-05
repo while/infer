@@ -49,7 +49,6 @@ unifpdf_test() ->
         ?assertEqual(0.1, unifpdf(10,0,10)),
         ?assertEqual(0.0, unifpdf(10.001,0,10)).
 
-
 unifcdf_test() ->
         ?assertEqual(0.0, unifcdf(-0.999,0,10)),
         ?assertEqual(0.0, unifcdf(0,0,10)),
@@ -63,5 +62,9 @@ unifinv_test() ->
         ?assertEqual(1.0, unifinv(0.1,0,10)),
         ?assertEqual(5.0, unifinv(0.5,0,10)),
         ?assertEqual(10.0, unifinv(1.0,0,10)).
+
+unifinv_error_test() ->
+        ?assertEqual({error,"Invalid probability"}, unifinv(-0.1,0,10)),
+        ?assertEqual({error,"Invalid probability"}, unifinv(1.1,0,10)).
 
 -endif.

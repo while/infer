@@ -83,8 +83,8 @@ gampdf_test() ->
 gamcdf_test() ->
         ?assertEqual(0.0, gamcdf(0.0,1,1)).
 
-gaminv_test() ->
-        ?assertEqual(0.0, gaminv(0.0,1,1)).
+%gaminv_test() ->
+%        ?assertEqual(0.0, gaminv(0.0,1,1)).
 
 
 
