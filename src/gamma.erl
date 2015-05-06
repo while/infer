@@ -171,6 +171,10 @@ gampdf_test() ->
         ?assertEqual(1.9199765904692206e-04, gampdf(20,20,2)),
         ?assertEqual(0.5413411329464507, gampdf(1.0,2,2)).
 
+gampdf_error_test() ->
+        ?assertEqual({error,"Alpha parameter =< 0."}, gampdf(0.0,-1, 1)),
+        ?assertEqual({error,"Beta parameter =< 0."},  gampdf(0.0, 1,-1)).
+
 gamcdf_test() ->
         ?assertEqual(0.0, gamcdf(0.0,1,1)),
         ?assertEqual(0.5132987982791589, gamcdf(100,100,1)),
@@ -178,6 +182,10 @@ gamcdf_test() ->
         ?assertEqual(0.9998236971022615, gamcdf(20,20,2)),
         ?assertEqual(0.12478121503252411, gamcdf(15,20,1)),
         ?assertEqual(0.9595723180054873, gamcdf(5,2,1)).
+
+gamcdf_error_test() ->
+        ?assertEqual({error,"Alpha parameter =< 0."}, gamcdf(0.0,-1, 1)),
+        ?assertEqual({error,"Beta parameter =< 0."},  gamcdf(0.0, 1,-1)).
 
 %gaminv_test() ->
 %        ?assertEqual(0.0, gaminv(0.0,1,1)).
