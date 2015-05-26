@@ -147,8 +147,50 @@ gcf_(A,X,B,C,D,H,I) ->
              end,
         gcf_(A,X,B2,C2,D2,H*D2*C2,I+1).
 
+%% Inverse of gammap
+invgammap(_,A) when A =< 0 -> {error, "Parameter a must be larger then zero in invgammap."};
 
-invgammap(_,_) -> not_implemented.
+invgammap(P,A) when P >= 1 -> math:max(100.0, A + 100.0 * math:sqrt(A));
+invgammap(P,_) when P =< 0 -> 0.0;
+
+invgammap(P,A) when A > 1 ->
+        PP = math:min(P,1-P),
+        T = math:sqrt(-2*math:log(PP)),
+        Sign = if P <  0.5 -> -1
+                ; P >= 0.5 -> 1
+               end,
+        X0 = Sign*(2.30753+T*0.27061)/(1+T*(0.99229+T*0.04481)) - T,
+        X = math:max(1.0e-3,A*math:pow(1-1/(9*A)-X0/(3*math:sqrt(A)),3)),
+        invgammap_(P,A,X,12);
+
+invgammap(P,A) ->
+        T = 1 - A*(0.253+A*0.12),
+        X = if P <  T -> math:pow(P/T,1.0/A)
+             ; P >= T -> 1 - math:log(1-(P-T)/(1-T))
+            end,
+        invgammap_(P,A,X,12).
+
+
+invgammap_(_,_,X,_) when X =< 0 -> 0.0; 
+invgammap_(_,_,X,0) -> X; 
+invgammap_(P,A,X,J) -> 
+        A1 = A - 1,
+        Gln = gammaln(A),
+        Lna1 = math:log(A1),
+        Afac = math:exp(A1*(Lna1-1)-Gln),
+        Err = gammap(A,X) - P,
+        T0 = if A >  1 -> Afac*math:exp(-(X-A1)+A1*(math:log(X)-Lna1))
+             ; A =< 1 -> math:exp(-X+A1*math:log(X)-Gln)
+            end,
+        U = Err/T0,
+        T = U/(1-0.5*math:min(1, U*((A-1)/X - 1))),
+        Xi = if X-T =< 0 -> 0.5*X
+              ; X-T >  0 -> X-T
+             end,
+        Stop = math:abs(T) < ?EPS*X,
+        if Stop -> invgammap_(P,A,Xi,0)
+         ; true -> invgammap_(P,A,Xi,J-1)
+        end.
 
 % ==============================================================================
 %  EUnit tests
@@ -187,8 +229,8 @@ gamcdf_error_test() ->
         ?assertEqual({error,"Alpha parameter =< 0."}, gamcdf(0.0,-1, 1)),
         ?assertEqual({error,"Beta parameter =< 0."},  gamcdf(0.0, 1,-1)).
 
-%gaminv_test() ->
-%        ?assertEqual(0.0, gaminv(0.0,1,1)).
+gaminv_test() ->
+        ?assertEqual(0.0, gaminv(0.0,1,1)).
 
 -endif.
 
