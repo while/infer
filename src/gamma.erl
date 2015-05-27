@@ -154,13 +154,13 @@ invgammap(P,A) when P >= 1 -> math:max(100.0, A + 100.0 * math:sqrt(A));
 invgammap(P,_) when P =< 0 -> 0.0;
 
 invgammap(P,A) when A > 1 ->
-        PP = math:min(P,1-P),
+        PP = min(P,1-P),
         T = math:sqrt(-2*math:log(PP)),
         Sign = if P <  0.5 -> -1
                 ; P >= 0.5 -> 1
                end,
         X0 = Sign*(2.30753+T*0.27061)/(1+T*(0.99229+T*0.04481)) - T,
-        X = math:max(1.0e-3,A*math:pow(1-1/(9*A)-X0/(3*math:sqrt(A)),3)),
+        X = max(1.0e-3,A*math:pow(1-1/(9*A)-X0/(3*math:sqrt(A)),3)),
         invgammap_(P,A,X,12);
 
 invgammap(P,A) ->
@@ -176,18 +176,20 @@ invgammap_(_,_,X,0) -> X;
 invgammap_(P,A,X,J) -> 
         A1 = A - 1,
         Gln = gammaln(A),
-        Lna1 = math:log(A1),
-        Afac = math:exp(A1*(Lna1-1)-Gln),
         Err = gammap(A,X) - P,
-        T0 = if A >  1 -> Afac*math:exp(-(X-A1)+A1*(math:log(X)-Lna1))
-             ; A =< 1 -> math:exp(-X+A1*math:log(X)-Gln)
+        T0 = if A >  1 -> 
+                        Lna1 = math:log(A1),
+                        Afac = math:exp(A1*(Lna1-1)-Gln),
+                        Afac*math:exp(-(X-A1)+A1*(math:log(X)-Lna1))
+             ; A =< 1 -> 
+                        math:exp(-X+A1*math:log(X)-Gln)
             end,
         U = Err/T0,
-        T = U/(1-0.5*math:min(1, U*((A-1)/X - 1))),
+        T = U/(1-0.5*min(1.0, U*((A-1)/X - 1))),
         Xi = if X-T =< 0 -> 0.5*X
               ; X-T >  0 -> X-T
              end,
-        Stop = math:abs(T) < ?EPS*X,
+        Stop = abs(T) < ?EPS*X,
         if Stop -> invgammap_(P,A,Xi,0)
          ; true -> invgammap_(P,A,Xi,J-1)
         end.
@@ -230,7 +232,14 @@ gamcdf_error_test() ->
         ?assertEqual({error,"Beta parameter =< 0."},  gamcdf(0.0, 1,-1)).
 
 gaminv_test() ->
-        ?assertEqual(0.0, gaminv(0.0,1,1)).
+        ?assertEqual(0.0, gaminv(0.0,1,1)),
+        ?assertEqual(0.6931471805599453, gaminv(0.5,1,1)),
+        ?assertEqual(0.22746821155978653, gaminv(0.5,0.5,1)),
+        ?assertEqual(4.670908882795983, gaminv(0.5,5,1)),
+        ?assertEqual(2.432591025962664, gaminv(0.1,5,1)),
+        ?assertEqual(4.865182051925328, gaminv(0.1,5,1/2)),
+        ?assertEqual(1.216295512981332, gaminv(0.1,5,2)),
+        ?assertEqual(3.9967947930263152, gaminv(0.9,5,2)).
 
 -endif.
 
