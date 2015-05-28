@@ -226,7 +226,8 @@ chisqcdf_test() ->
         ?assertEqual(0.8427007929497147, chisqcdf(2,1)),
         ?assertEqual(0.3934693402873665, chisqcdf(1,2)),
         ?assertEqual(0.9932620530009145, chisqcdf(10,2)),
-        ?assertEqual(0.0036598468273437135, chisqcdf(2,10)).
+        ?assertEqual(0.0036598468273437135, chisqcdf(2,10)),
+        ?assertEqual(0.5132987982791589, chisqcdf(200,200)).
 
 chisqcdf_error_test() ->
         ?assertEqual({error,"Nu parameter =< 0 in Chi-square."},  chisqcdf(0.0,-1)).
@@ -239,6 +240,10 @@ chisqinv_test() ->
         ?assertEqual(1.3862943611198906, chisqinv(0.5,2)),
         ?assertEqual(15.987179172105261, chisqinv(0.9,10)).
 
+chisqinv_error_test() ->
+        ?assertEqual({error,"Nu parameter =< 0 in Chi-square."},  chisqinv(0.5,-1)),
+        ?assertEqual({error,"Invalid probability"},  chisqinv(-0.5,1)),
+        ?assertEqual({error,"Invalid probability"},  chisqinv(2,1)).
 
 -endif.
 
