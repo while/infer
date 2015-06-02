@@ -9,7 +9,7 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
--define(SQR(X), (X*X)).
+-define(SQR(X), ((X)*(X))).
 
 % ------------------------------------------------------------------------------
 %  cauchypdf - Cauchy probability density function
