@@ -71,11 +71,11 @@ fdistpdf_error_test() ->
 
 fdistcdf_test() ->
         ?assertEqual(0.0, fdistcdf(-1.0,1,1)),
-        ?assertEqual(0.4999999999999996, fdistcdf(1,1,1)),
-        ?assertEqual(0.8427007929497147, fdistcdf(2,1,1)),
-        ?assertEqual(0.3934693402873665, fdistcdf(1,2,1)),
-        ?assertEqual(0.9932620530009145, fdistcdf(10,2,1)),
-        ?assertEqual(0.0036598468273437135, fdistcdf(2,10,1)).
+        ?assertEqual(0.5000000000000007, fdistcdf(1,1,1)),
+        ?assertEqual(0.6081734479693931, fdistcdf(2,1,1)),
+        ?assertEqual(0.42264973081037405, fdistcdf(1,2,1)),
+        ?assertEqual(0.7817821097640074, fdistcdf(10,2,1)),
+        ?assertEqual(0.4956475043831201, fdistcdf(2,10,1)).
 
 fdistcdf_error_test() ->
         ?assertEqual({error,"Nu1 parameter =< 0 in F-dist."},  fdistcdf(0.0,-1,1)),
