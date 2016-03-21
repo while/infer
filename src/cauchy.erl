@@ -76,6 +76,11 @@ cauchyinv_test() ->
         ?assertEqual(34.49196962329062, cauchyinv(0.6,2,100)),
         ?assertEqual(11.155367074350504, cauchyinv(0.9,5,2)).
 
+cauchyinv_error_test() ->
+        ?assertEqual({error,"Sigma parameter =< 0 in Cauchy dist."},  cauchyinv(0.0, 1,-1)),
+        ?assertEqual({error,"Invalid probability in Cauchy dist"},  cauchyinv(-0.1, 1,1)),
+        ?assertEqual({error,"Invalid probability in Cauchy dist"},  cauchyinv(2.0, 1,1)).
+
 -endif.
 
 
