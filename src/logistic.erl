@@ -41,6 +41,7 @@ logisticinv(_,_,Sig) when Sig =< 0 ->
 logisticinv(P,_,_) when P < 0 orelse P > 1 ->
         {error,"Invalid probability in Logistic dist"};
 
+% TODO: Implement logisticinv
 logisticinv(_,_,_) -> not_implemented.
 
 
@@ -59,7 +60,8 @@ logisticpdf_test() ->
         ?assertEqual(0.2186158850951135, logisticpdf(1,0,1)).
 
 logisticpdf_error_test() ->
-        ?assertEqual({error,"Sigma parameter =< 0 in Logistic dist."},  logisticpdf(0.0, 1,-1)).
+        ?assertEqual({error,"Sigma parameter =< 0 in Logistic dist."},
+                     logisticpdf(0.0, 1,-1)).
 
 logisticcdf_test() ->
         ?assertEqual(0.5, logisticcdf(0.0,0,1)),
@@ -70,10 +72,18 @@ logisticcdf_test() ->
         ?assertEqual(0.673841274757147, logisticcdf(5.0001,4.2,2)).
 
 logisticcdf_error_test() ->
-        ?assertEqual({error,"Sigma parameter =< 0 in Logistic dist."},  logisticcdf(0.0, 1,-1)).
+        ?assertEqual({error,"Sigma parameter =< 0 in Logistic dist."},
+                     logisticcdf(0.0, 1,-1)).
 
 logisticinv_test() ->
         ?assertEqual(not_implemented, logisticinv(0.1,1,1)).
+
+logisticinv_error_test() ->
+        ?assertEqual({error,"Sigma parameter =< 0 in Logistic dist."},
+                     logisticinv(0.0, 1,-1)),
+        ?assertEqual({error,"Invalid probability in Logistic dist"},
+                     logisticinv(-1.0, 1,1)).
+
 
 -endif.
 
