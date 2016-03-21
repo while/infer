@@ -174,7 +174,7 @@ betai(_,B,_) when B =< 0.0 -> {error, "Bad arg B in function betai."};
 betai(_,_,X) when X < 0.0 orelse X > 1.0 -> {error, "Bad arg X in function betai."};
 %% Border cases
 betai(_,_,0) -> 0.0;
-betai(A,B,1) -> 1.0;
+betai(_,_,1) -> 1.0;
 % betai(A,B,1) -> math:exp(gammaln(A) + gammaln(B) - gammaln(A+B));
 %% Use approximations for extreme params
 betai(A,B,X) when A > ?SWITCH andalso B > ?SWITCH -> betaiapprox(A,B,X);
@@ -233,7 +233,54 @@ betaiapprox(_,_,_) -> {error, "Not implemented"}.
 
 
 %%
-invbetai(_,_,_) -> {error, "Not implemented"}.
+invbetai(P,_,_) when P =< 0 -> 0.0;
+invbetai(P,_,_) when P >= 1 -> 1.0;
+invbetai(P,A,B) when A >= 1 andalso B >= 1 -> 
+        PP = min(P, 1-P),
+        T = math:sqrt(-2.0*math:log(PP)),
+        X0 = (2.30753+T*0.27061)/(1.0+T*(0.99229+T*0.04481)) - T,
+        X = if P =< 0.5 -> -X0
+             ; P >  0.5 ->  X0
+            end,
+        Al = (X*X-3.0)/6.0,
+        H = 2.0/(1.0/(2.0*A-1.0)+1.0/(2.0*B-1.0)),
+        W = (X*math:sqrt(Al+H)/H) 
+                - (1.0/(2.0*B-1)-1.0/(2.0*A-1.0))
+                * (Al+5.0/6.0-2.0/(3.0*H)),
+        Xn = A/(A+B*math:exp(2.0*W)),
+        invbetai_(P,A,B,Xn,0);
+
+invbetai(P,A,B) -> 
+	Lna = math:log(A/(A+B)),
+	Lnb = math:log(B/(A+B)),
+	T = math:exp(A*Lna)/A,
+	U = math:exp(B*Lnb)/B,
+	W = T + U,
+	X = if P < T/W -> math:pow(A*W*P,1.0/A)
+	     ; true    -> 1.0 - math:pow(B*W*(1.0-P),1.0/B)
+	    end,
+        invbetai_(P,A,B,X,0).
+
+
+%% 
+invbetai_(_,_,_,0.0,_) -> 0.0;
+invbetai_(_,_,_,1.0,_) -> 1.0;
+invbetai_(_,_,_,X,10) -> X;
+
+invbetai_(P,A,B,X,N) -> 
+        Afac = -gammaln(A)-gammaln(B)+gammaln(A+B),
+        Err = betai(A,B,X) - P,
+        T = math:exp((A-1)*math:log(X)+(B-1)*math:log(1.0-X) + Afac),
+        U = Err/T,
+        Tn = U/(1.0 - 0.5*min(1.0,U*((A-1)/X - (B-1)/(1.0-X)))),
+        X0 = X - Tn,
+        Xn = if X0 =< 0.0 -> 0.5*(X0 + T)
+              ; X0 >= 1.0 -> 0.5*(X0 + T + 1.0)
+              ; true      -> X0
+             end,
+
+        invbetai_(P,A,B,Xn,N+1).
+
 
 % ==============================================================================
 %  EUnit tests
@@ -259,4 +306,15 @@ betai_test() ->
         ?assertEqual(0.11086997774500017, betai(3,10,0.1)),
         ?assertEqual(5.455000000000031e-9, betai(10,3,0.1)),
         ?assertEqual(1.0, betai(2,1,1)).
+
+
+invbetai_test() ->
+        ?assertEqual(0.0, invbetai(-1,1,1)),
+        ?assertEqual(0.0, invbetai(0,1,1)),
+        ?assertEqual(1.0, invbetai(1,1,1)),
+        ?assertEqual(1.0, invbetai(10,1,1)),
+        ?assertEqual(0.4999999999999997, invbetai(0.5,2,2)),
+        ?assertEqual(0.950548152829731596, invbetai(0.9,10,2)),
+        ?assertEqual(0.06424517809580489, invbetai(0.001,7,20)).
+
 -endif.
