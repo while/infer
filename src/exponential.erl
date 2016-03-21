@@ -3,7 +3,7 @@
 % ==============================================================================
 -module(exponential).
 
--export([exppdf/2, expcdf/2, expinv/2]).
+-export([exppdf/2, expcdf/2, expinv/2, exprng/2]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -35,12 +35,22 @@ expinv(P,Lambda) ->
         -math:log(1-P)/Lambda.
 
 
+% ------------------------------------------------------------------------------
+%  exprnd - RNG function
+% ------------------------------------------------------------------------------
+exprng(_,Lambda) when Lambda =< 0 -> {error, "Lambda is smaller than zero."};
+exprng(N,Lambda) ->
+        lists:map(fun(_) -> expinv(rand:uniform(),Lambda) end, lists:seq(1,N)).
 
 % ==============================================================================
 %  EUnit tests
 % ------------------------------------------------------------------------------
 -ifdef(TEST).
 
+
+% ------------------------------------------------------------------------------
+%  pdf tests
+% ------------------------------------------------------------------------------
 exppdf_test() ->
         ?assertEqual(0.0, exppdf(-1.0,10)),
         ?assertEqual(10.0, exppdf(0.0,10)),
@@ -52,6 +62,10 @@ exppdf_test() ->
 exppdf_error_test() ->
         ?assertEqual({error,"Lambda is smaller than zero."}, exppdf(1.0,-1)).
 
+
+% ------------------------------------------------------------------------------
+%  cdf tests
+% ------------------------------------------------------------------------------
 expcdf_test() ->
         ?assertEqual(0.0, expcdf(-1.0,10)),
         ?assertEqual(0.0, expcdf(0.0,10)),
@@ -64,6 +78,10 @@ expcdf_test() ->
 expcdf_error_test() ->
         ?assertEqual({error,"Lambda is smaller than zero."}, expcdf(1.0,-1)).
 
+
+% ------------------------------------------------------------------------------
+%  inv tests
+% ------------------------------------------------------------------------------
 expinv_test() ->
         ?assertEqual(0.0, expinv(0.0,10)),
         ?assertEqual(0.010536051565782628, expinv(0.1,10)),
@@ -74,6 +92,21 @@ expinv_error_test() ->
         ?assertEqual({error,"Lambda is smaller than zero."}, expinv(1.0,-1)),
         ?assertEqual({error,"Invalid probability"}, expinv(-0.1,10)),
         ?assertEqual({error,"Invalid probability"}, expinv(1.1,10)).
+
+
+% ------------------------------------------------------------------------------
+%  rng tests
+% ------------------------------------------------------------------------------
+exprng_positive_test() ->
+        [X] = exprng(1,1), 
+        ?assert(X >= 0.0).
+
+exprng_length_test() ->
+        Xs = exprng(23,1), 
+        ?assert(length(Xs) =:= 23).
+
+exprng_error_test() ->
+        ?assertEqual({error,"Lambda is smaller than zero."}, exprng(1,-1)).
 
 -endif.
 
