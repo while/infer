@@ -3,7 +3,7 @@
 % ==============================================================================
 -module(uniform).
 
--export([unifpdf/3, unifcdf/3, unifinv/3]).
+-export([unifpdf/3, unifcdf/3, unifinv/3, unifrng/3]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -34,12 +34,21 @@ unifinv(P,A,B) ->
         A + P*(B-A).
 
 
+% ------------------------------------------------------------------------------
+%  unifrng - RNG function
+% ------------------------------------------------------------------------------
+unifrng(N,A,B) ->
+        lists:map(fun(_) -> unifinv(rand:uniform(),A,B) end, lists:seq(1,N)).
+
 
 % ==============================================================================
 %  EUnit tests
 % ------------------------------------------------------------------------------
 -ifdef(TEST).
 
+% ------------------------------------------------------------------------------
+%  pdf tests
+% ------------------------------------------------------------------------------
 unifpdf_test() ->
         ?assertEqual(0.0, unifpdf(-0.999,0,10)),
         ?assertEqual(0.1, unifpdf(0,0,10)),
@@ -49,6 +58,10 @@ unifpdf_test() ->
         ?assertEqual(0.1, unifpdf(10,0,10)),
         ?assertEqual(0.0, unifpdf(10.001,0,10)).
 
+
+% ------------------------------------------------------------------------------
+%  cdf tests
+% ------------------------------------------------------------------------------
 unifcdf_test() ->
         ?assertEqual(0.0, unifcdf(-0.999,0,10)),
         ?assertEqual(0.0, unifcdf(0,0,10)),
@@ -58,6 +71,10 @@ unifcdf_test() ->
         ?assertEqual(1.0, unifcdf(10,0,10)),
         ?assertEqual(1.0, unifcdf(10.001,0,10)).
 
+
+% ------------------------------------------------------------------------------
+%  inv tests
+% ------------------------------------------------------------------------------
 unifinv_test() ->
         ?assertEqual(1.0, unifinv(0.1,0,10)),
         ?assertEqual(5.0, unifinv(0.5,0,10)),
@@ -66,5 +83,18 @@ unifinv_test() ->
 unifinv_error_test() ->
         ?assertEqual({error,"Invalid probability"}, unifinv(-0.1,0,10)),
         ?assertEqual({error,"Invalid probability"}, unifinv(1.1,0,10)).
+
+
+% ------------------------------------------------------------------------------
+%  rng tests
+% ------------------------------------------------------------------------------
+unifrng_positive_test() ->
+        [X] = unifrng(1,0,10), 
+        ?assert(X >= 0.0 andalso X =< 10.0).
+
+unifrng_length_test() ->
+        Xs = unifrng(23,1,3), 
+        ?assert(length(Xs) =:= 23).
+
 
 -endif.
