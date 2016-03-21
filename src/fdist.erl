@@ -83,11 +83,11 @@ fdistcdf_error_test() ->
 
 fdistinv_test() ->
         ?assertEqual(0.0, fdistinv(0.0,1,1)),
-        ?assertEqual(0.015790774093431218, fdistinv(0.1,1,1)),
-        ?assertEqual(0.2107210313156527, fdistinv(0.1,2,1)),
-        ?assertEqual(0.45493642311957305, fdistinv(0.5,1,1)),
-        ?assertEqual(1.3862943611198906, fdistinv(0.5,2,1)),
-        ?assertEqual(15.987179172105261, fdistinv(0.9,10,1)).
+        ?assertEqual(0.025085630936916625, fdistinv(0.1,1,1)),
+        ?assertEqual(0.1172839506172838, fdistinv(0.1,2,1)),
+        ?assertEqual(0.9999999999999966, fdistinv(0.5,1,1)),
+        ?assertEqual(1.5000000000000018, fdistinv(0.5,2,1)),
+        ?assertEqual(60.19498034404559, fdistinv(0.9,10,1)).
 
 fdistinv_error_test() ->
         ?assertEqual({error,"Nu1 parameter =< 0 in F-dist."},  fdistinv(0.0,-1,1)),
