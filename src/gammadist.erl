@@ -80,6 +80,12 @@ gaminv_test() ->
         ?assertEqual(1.216295512981332, gaminv(0.1,5,2)),
         ?assertEqual(3.9967947930263152, gaminv(0.9,5,2)).
 
+gaminv_error_test() ->
+        ?assertEqual({error,"Alpha parameter =< 0."}, gaminv(0.0,-1, 1)),
+        ?assertEqual({error,"Beta parameter =< 0."},  gaminv(0.0, 1,-1)),
+        ?assertEqual({error,"Invalid probability"},  gaminv(-1.0,1,1)),
+        ?assertEqual({error,"Invalid probability"},  gaminv(1.1,1,1)).
+
 -endif.
 
 
