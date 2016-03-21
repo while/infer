@@ -292,10 +292,22 @@ gammaln_test() ->
         ?assertEqual(-0.09447840768115956, gammaln(1.234)),
         ?assertEqual(18.734347511936445, gammaln(12.5)).
 
-gammap_test() ->
+gammaln_param_test() ->
+        ?assertEqual({error,"Bad arg to gammln."}, gammaln(-0.123)).
+
+gammap_param_test() ->
         ?assertEqual({error, "Bad args in gammap."}, gammap(-1.0, 1.0)),
-        ?assertEqual({error, "Bad args in gammap."}, gammap( 1.0,-1.0)),
+        ?assertEqual({error, "Bad args in gammap."}, gammap( 1.0,-1.0)).
+
+gammap_test() ->
         ?assertEqual(0.0, gammap(1.0, 0.0)).
+
+gammapapprox_test() ->
+        ?assertEqual(0.147137348442258092, gammap(111, 100)).
+
+invgammap_param_test() ->
+        ?assertEqual({error, "Parameter a must be larger then zero in invgammap."},
+                    invgammap(1.0,-1)).
 
 betai_test() ->
         ?assertEqual(1.0, betai(1,1,1)),
