@@ -168,63 +168,65 @@ invgammap_(P,A,X,J) ->
 %  Beta functions
 % ------------------------------------------------------------------------------
 
-%% 
+%% Parameter checks 
 betai(A,_,_) when A =< 0.0 -> {error, "Bad arg A in function betai."};
 betai(_,B,_) when B =< 0.0 -> {error, "Bad arg B in function betai."};
 betai(_,_,X) when X < 0.0 orelse X > 1.0 -> {error, "Bad arg X in function betai."};
-
-betai(A,B,X) when X == 0.0 orelse X == 1.0 -> 1.0*X;
+%% Border cases
+betai(_,_,0) -> 0.0;
+betai(A,B,1) -> 1.0;
+% betai(A,B,1) -> math:exp(gammaln(A) + gammaln(B) - gammaln(A+B));
+%% Use approximations for extreme params
 betai(A,B,X) when A > ?SWITCH andalso B > ?SWITCH -> betaiapprox(A,B,X);
-betai(A,B,X) ->
+%% The rest use the normal definition
+betai(A,B,X) -> 
         Bt = math:exp(gammaln(A+B) - gammaln(A) - gammaln(B) + A*math:log(X)
                       + B*math:log(1.0-X)),
-        if X <  (A+1.0)/(A+B+2.0) -> Bt*betacf(A,B,X)/A 
-         ; X >= (A+1.0)/(A+B+2.0) -> 1.0 - Bt*betacf(B,A,1.0-X)/B
+        if X <  ((A+1.0)/(A+B+2.0)) -> Bt*betacf(A,B,X)/A 
+         ; X >= ((A+1.0)/(A+B+2.0)) -> 1.0 - Bt*betacf(B,A,1.0-X)/B
         end.
+
+
+%% Use a minimum value if absollute value is less than the cap.
+absmin(X,Cap) ->
+	if abs(X) <  Cap -> Cap
+         ; abs(X) >= Cap -> X
+        end.
+
 
 %% 
 betacf(A,B,X) ->
 	Qab = A + B,
 	Qap = A + 1.0,
 	C   = 1.0,
-	D0  = 1.0 - Qab*X/Qap,
-	D1  = if abs(D0) <  ?FPMIN -> ?FPMIN
-               ; abs(D0) >= ?FPMIN -> D0
-              end,
-        D = 1.0/D1,
+	D  = 1.0/absmin(1.0 - Qab*X/Qap, ?FPMIN),
 	H = D,
-	betacf_(A,B,X,C,D,H,10000).
-	
+	betacf_(A,B,X,C,D,H,1).
+
+
 %% betacf helper function
-betacf_(_,_,_,_,_,H,0) -> H;
+betacf_(_,_,_,_,_,H,10000) -> H;
 betacf_(A,B,X,C,D,H,M) ->
 	Qab = A + B,
 	Qap = A + 1.0,
 	Qam = A - 1.0,
 	M2 = 2*M,
+
 	AA = M*(B-M)*X/((Qam+M2)*(A+M2)),
-	D0 = if abs(D) <  ?FPMIN -> ?FPMIN
-              ; abs(D) >= ?FPMIN -> 1.0+AA*D
-             end,
-	C0 = if abs(C) <  ?FPMIN -> ?FPMIN
-              ; abs(C) >= ?FPMIN -> 1.0+AA/C
-             end,
-	D1 = 1.0/D0,
-	H0 = H*D1*C0,
+	D0 = 1.0/absmin(1.0+AA*D, ?FPMIN),
+	C0 = absmin(1.0+AA/C, ?FPMIN),
+	H0 = H*D0*C0,
+
 	AB = -(A+M)*(Qab+M)*X/((A+M2)*(Qap+M2)),
-	D2 = if abs(D1) <  ?FPMIN -> ?FPMIN
-              ; abs(D1) >= ?FPMIN -> 1.0+AB*D1
-             end,
-	C1 = if abs(C0) <  ?FPMIN -> ?FPMIN
-              ; abs(C0) >= ?FPMIN -> 1.0+AB/C0
-             end,
-	D3 = 1.0/D2,
-	H1 = H0*D3*C1,
-	M0 = case abs(D3*C1) =< ?EPS of
-               true  -> 0;
-	       false -> M - 1
+	D1 = 1.0/absmin(1.0+AB*D0, ?FPMIN),
+	C1 = absmin(1.0+AB/C0, ?FPMIN),
+	H1 = H0*D1*C1,
+
+	N  = case abs(D1*C1 - 1.0) =< ?EPS of
+               true  -> 10000;
+	       false -> M + 1
 	     end,
-	betacf_(A,B,X,C1,D3,H1,M0).
+	betacf_(A,B,X,C1,D1,H1,N).
 
 %%
 betaiapprox(_,_,_) -> {error, "Not implemented"}.
@@ -251,7 +253,10 @@ gammap_test() ->
 betai_test() ->
         ?assertEqual(1.0, betai(1,1,1)),
         ?assertEqual(0.0, betai(1,1,0)),
-        ?assertEqual(99/200, betai(1,2,0.9)),
-        ?assertEqual(0.000167984814765151515151515, betai(3,10,0.1)),
-        ?assertEqual(1/2, betai(2,1,1)).
+        ?assertEqual(9/10, betai(1,1,0.9)),
+        ?assertEqual(0.7499999999999998, betai(1,2,0.5)),
+        ?assertEqual(0.99, betai(1,2,0.9)),
+        ?assertEqual(0.11086997774500017, betai(3,10,0.1)),
+        ?assertEqual(5.455000000000031e-9, betai(10,3,0.1)),
+        ?assertEqual(1.0, betai(2,1,1)).
 -endif.
