@@ -91,7 +91,8 @@ fdistinv_test() ->
 
 fdistinv_error_test() ->
         ?assertEqual({error,"Nu1 parameter =< 0 in F-dist."},  fdistinv(0.0,-1,1)),
-        ?assertEqual({error,"Nu2 parameter =< 0 in F-dist."},  fdistinv(0.0,1,-1)).
+        ?assertEqual({error,"Nu2 parameter =< 0 in F-dist."},  fdistinv(0.0,1,-1)),
+        ?assertEqual({error,"Invalid probability"},  fdistinv(-0.1,1,1)).
 
 -endif.
 
