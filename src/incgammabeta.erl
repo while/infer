@@ -119,7 +119,7 @@ gcf_(A,X,B,C,D,H,I) ->
 %% Inverse of gammap
 invgammap(_,A) when A =< 0 -> {error, "Parameter a must be larger then zero in invgammap."};
 
-invgammap(P,A) when P >= 1 -> math:max(100.0, A + 100.0 * math:sqrt(A));
+invgammap(P,A) when P >= 1 -> max(100.0, A + 100.0 * math:sqrt(A));
 invgammap(P,_) when P =< 0 -> 0.0;
 
 invgammap(P,A) when A > 1 ->
@@ -308,6 +308,19 @@ gammapapprox_test() ->
 invgammap_param_test() ->
         ?assertEqual({error, "Parameter a must be larger then zero in invgammap."},
                     invgammap(1.0,-1)).
+
+invgammap_large_p_test() ->
+        ?assertEqual(100.0, invgammap(2.0,0.1)),
+        ?assertEqual(100.0, invgammap(200.0,0.1)),
+        ?assertEqual(143.421356237309510107, invgammap(2.0,2.0)).
+
+invgammap_small_A_test() ->
+        ?assertEqual(1.119032936887381702, invgammap(0.98,0.1)).
+
+betai_param_test() ->
+        ?assertEqual({error, "Bad arg A in function betai."}, betai(-1,1,1)),
+        ?assertEqual({error, "Bad arg B in function betai."}, betai(1,-1,1)),
+        ?assertEqual({error, "Bad arg X in function betai."}, betai(1,1,-1)).
 
 betai_test() ->
         ?assertEqual(1.0, betai(1,1,1)),
