@@ -173,8 +173,8 @@ betai(A,_,_) when A =< 0.0 -> {error, "Bad arg A in function betai."};
 betai(_,B,_) when B =< 0.0 -> {error, "Bad arg B in function betai."};
 betai(_,_,X) when X < 0.0 orelse X > 1.0 -> {error, "Bad arg X in function betai."};
 %% Border cases
-betai(_,_,0) -> 0.0;
-betai(_,_,1) -> 1.0;
+betai(_,_,0.0) -> 0.0;
+betai(_,_,1.0) -> 1.0;
 % betai(A,B,1) -> math:exp(gammaln(A) + gammaln(B) - gammaln(A+B));
 %% Use approximations for extreme params
 betai(A,B,X) when A > ?SWITCH andalso B > ?SWITCH -> betaiapprox(A,B,X);
@@ -323,14 +323,14 @@ betai_param_test() ->
         ?assertEqual({error, "Bad arg X in function betai."}, betai(1,1,-1)).
 
 betai_test() ->
-        ?assertEqual(1.0, betai(1,1,1)),
-        ?assertEqual(0.0, betai(1,1,0)),
+        ?assertEqual(1.0, betai(1,1,1.0)),
+        ?assertEqual(0.0, betai(1,1,0.0)),
         ?assertEqual(9/10, betai(1,1,0.9)),
         ?assertEqual(0.7499999999999998, betai(1,2,0.5)),
         ?assertEqual(0.99, betai(1,2,0.9)),
         ?assertEqual(0.11086997774500017, betai(3,10,0.1)),
         ?assertEqual(5.455000000000031e-9, betai(10,3,0.1)),
-        ?assertEqual(1.0, betai(2,1,1)).
+        ?assertEqual(1.0, betai(2,1,1.0)).
 
 
 invbetai_test() ->
