@@ -9,15 +9,11 @@ deps
 ebin/
 .ebin/
 .rebar/
-=======
 .eunit
 deps
 *.o
 *.beam
 *.plt
 erl_crash.dump
-ebin
-rel/example_project
 .concrete/DEV_MODE
-.rebar
->>>>>>> 5229020eb62a5b46148eab04672a790d21d81b80
+tmp/
