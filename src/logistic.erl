@@ -3,7 +3,7 @@
 % ==============================================================================
 -module(logistic).
 
--export([logisticpdf/3, logisticcdf/3, logisticinv/3]).
+-export([pdf/3, cdf/3, invcdf/3]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -12,37 +12,37 @@
 -define(SQR(X), ((X)*(X))).
 
 % ------------------------------------------------------------------------------
-%  logisticpdf - Logistic probability density function
+%  pdf - Logistic probability density function
 % ------------------------------------------------------------------------------
-logisticpdf(_,_,Sig) when Sig =< 0 -> 
+pdf(_,_,Sig) when Sig =< 0 -> 
         {error,"Sigma parameter =< 0 in Logistic dist."};
 
-logisticpdf(X,Mu,Sig) ->
+pdf(X,Mu,Sig) ->
         E = math:exp(-abs(1.81379936423421785*(X-Mu)/Sig)),
         1.81379936423421785*E/(Sig*?SQR(1+E)).
 
 % ------------------------------------------------------------------------------
-%  logisticcdf - Logistic cumulative distribution function
+%  cdf - Logistic cumulative distribution function
 % ------------------------------------------------------------------------------
-logisticcdf(_,_,Sig) when Sig =< 0 -> 
+cdf(_,_,Sig) when Sig =< 0 -> 
         {error,"Sigma parameter =< 0 in Logistic dist."};
 
-logisticcdf(X,Mu,Sig) ->
+cdf(X,Mu,Sig) ->
         E = math:exp(-1.81379936423421785*(X-Mu)/Sig),
         1/(1+E).
 
         
 % ------------------------------------------------------------------------------
-%  logisticinv - Inverse logistic distribution function
+%  invcdf - Inverse logistic distribution function
 % ------------------------------------------------------------------------------
-logisticinv(_,_,Sig) when Sig =< 0 ->
+invcdf(_,_,Sig) when Sig =< 0 ->
         {error,"Sigma parameter =< 0 in Logistic dist."};
 
-logisticinv(P,_,_) when P < 0 orelse P > 1 ->
+invcdf(P,_,_) when P < 0 orelse P > 1 ->
         {error,"Invalid probability in Logistic dist"};
 
-% TODO: Implement logisticinv
-logisticinv(_,_,_) -> not_implemented.
+% TODO: Implement invcdf
+invcdf(_,_,_) -> not_implemented.
 
 
 
@@ -52,37 +52,37 @@ logisticinv(_,_,_) -> not_implemented.
 -ifdef(TEST).
 
 
-logisticpdf_test() ->
-        ?assertEqual(0.45344984105855446, logisticpdf(0.0,0,1)),
-        ?assertEqual(0.45344984105855446, logisticpdf(100,100,1)),
-        ?assertEqual(0.18582462414585452, logisticpdf(0,1,2)),
-        ?assertEqual(0.044974071984070316, logisticpdf(1,0,10)),
-        ?assertEqual(0.2186158850951135, logisticpdf(1,0,1)).
+pdf_test() ->
+        ?assertEqual(0.45344984105855446, pdf(0.0,0,1)),
+        ?assertEqual(0.45344984105855446, pdf(100,100,1)),
+        ?assertEqual(0.18582462414585452, pdf(0,1,2)),
+        ?assertEqual(0.044974071984070316, pdf(1,0,10)),
+        ?assertEqual(0.2186158850951135, pdf(1,0,1)).
 
-logisticpdf_error_test() ->
+pdf_error_test() ->
         ?assertEqual({error,"Sigma parameter =< 0 in Logistic dist."},
-                     logisticpdf(0.0, 1,-1)).
+                     pdf(0.0, 1,-1)).
 
-logisticcdf_test() ->
-        ?assertEqual(0.5, logisticcdf(0.0,0,1)),
-        ?assertEqual(0.5, logisticcdf(100,100,1)),
-        ?assertEqual(0.9999999999999933, logisticcdf(20,2,1)),
-        ?assertEqual(1.1516876350885883e-04, logisticcdf(2,7,1)),
-        ?assertEqual(0.9998848312364911, logisticcdf(-15,-20,1)),
-        ?assertEqual(0.673841274757147, logisticcdf(5.0001,4.2,2)).
+cdf_test() ->
+        ?assertEqual(0.5, cdf(0.0,0,1)),
+        ?assertEqual(0.5, cdf(100,100,1)),
+        ?assertEqual(0.9999999999999933, cdf(20,2,1)),
+        ?assertEqual(1.1516876350885883e-04, cdf(2,7,1)),
+        ?assertEqual(0.9998848312364911, cdf(-15,-20,1)),
+        ?assertEqual(0.673841274757147, cdf(5.0001,4.2,2)).
 
-logisticcdf_error_test() ->
+cdf_error_test() ->
         ?assertEqual({error,"Sigma parameter =< 0 in Logistic dist."},
-                     logisticcdf(0.0, 1,-1)).
+                     cdf(0.0, 1,-1)).
 
-logisticinv_test() ->
-        ?assertEqual(not_implemented, logisticinv(0.1,1,1)).
+invcdf_test() ->
+        ?assertEqual(not_implemented, invcdf(0.1,1,1)).
 
-logisticinv_error_test() ->
+invcdf_error_test() ->
         ?assertEqual({error,"Sigma parameter =< 0 in Logistic dist."},
-                     logisticinv(0.0, 1,-1)),
+                     invcdf(0.0, 1,-1)),
         ?assertEqual({error,"Invalid probability in Logistic dist"},
-                     logisticinv(-1.0, 1,1)).
+                     invcdf(-1.0, 1,1)).
 
 
 -endif.
