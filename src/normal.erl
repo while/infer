@@ -3,7 +3,7 @@
 % ==============================================================================
 -module(normal).
 
--export([normpdf/3, normcdf/3, norminv/3]).
+-export([pdf/3, cdf/3, invcdf/3]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -11,22 +11,22 @@
 
 
 % ------------------------------------------------------------------------------
-%  normpdf - Normal probability density function
+%  pdf - Normal probability density function
 % ------------------------------------------------------------------------------
-normpdf(X,Mu,Sig) ->
+pdf(X,Mu,Sig) ->
         (0.398942280401432678/Sig)*math:exp(-0.5*math:pow((X - Mu)/Sig, 2)).
 
 % ------------------------------------------------------------------------------
-%  normcdf - Normal cumulative distribution function
+%  cdf - Normal cumulative distribution function
 % ------------------------------------------------------------------------------
-normcdf(X,Mu,Sig) ->
+cdf(X,Mu,Sig) ->
         0.5*erfc(-0.707106781186547524*(X-Mu)/Sig).
         
 % ------------------------------------------------------------------------------
-%  norminv - Inverse normal distribution function
+%  invcdf - Inverse normal distribution function
 % ------------------------------------------------------------------------------
-norminv(P,_,_) when P < 0 orelse P > 1 -> {error,"Invalid probability"};
-norminv(P,Mu,Sig) ->
+invcdf(P,_,_) when P < 0 orelse P > 1 -> {error,"Invalid probability"};
+invcdf(P,Mu,Sig) ->
         -1.41421356237309505*Sig*inverfc(2*P)+Mu.
 
 % ------------------------------------------------------------------------------
@@ -62,23 +62,23 @@ inverfc(P) ->
 % ------------------------------------------------------------------------------
 -ifdef(TEST).
 
-normpdf_test() ->
-        ?assertEqual(0.0, normpdf(-100,0,1)),
-        ?assertEqual(0.3520653267642995, normpdf(-0.5,0,1)),
-        ?assertEqual(0.3989422804014327, normpdf(0,0,1)),
-        ?assertEqual(0.3520653267642995, normpdf(0.5,0,1)),
-        ?assertEqual(0.0, normpdf(100,0,1)).
+pdf_test() ->
+        ?assertEqual(0.0, pdf(-100,0,1)),
+        ?assertEqual(0.3520653267642995, pdf(-0.5,0,1)),
+        ?assertEqual(0.3989422804014327, pdf(0,0,1)),
+        ?assertEqual(0.3520653267642995, pdf(0.5,0,1)),
+        ?assertEqual(0.0, pdf(100,0,1)).
 
 
-normcdf_test() ->
-        ?assertEqual(0.0, normcdf(-100,0,1)),
-        ?assertEqual(0.3085375387259869, normcdf(-0.5,0,1)),
-        ?assertEqual(0.5, normcdf(0,0,1)),
-        ?assertEqual(0.6914624612740131, normcdf(0.5,0,1)),
-        ?assertEqual(1.0, normcdf(100,0,1)).
+cdf_test() ->
+        ?assertEqual(0.0, cdf(-100,0,1)),
+        ?assertEqual(0.3085375387259869, cdf(-0.5,0,1)),
+        ?assertEqual(0.5, cdf(0,0,1)),
+        ?assertEqual(0.6914624612740131, cdf(0.5,0,1)),
+        ?assertEqual(1.0, cdf(100,0,1)).
 
-norminv_test() ->
-        ?assert(1.0e-16 >= norminv(0.5,0,1)).
+invcdf_test() ->
+        ?assert(1.0e-16 >= invcdf(0.5,0,1)).
 
 erfc_test() ->
         ?assertEqual(0.0, erfc(100)),
@@ -93,8 +93,8 @@ inverfc_test() ->
         ?assertEqual(-0.3708071585935579, inverfc(1.4)),
         ?assertEqual(-100, inverfc(2)).
 
-norminv_error_test() ->
-        ?assertEqual({error,"Invalid probability"}, norminv(-0.1,0,10)),
-        ?assertEqual({error,"Invalid probability"}, norminv(1.1,0,10)).
+invcdf_error_test() ->
+        ?assertEqual({error,"Invalid probability"}, invcdf(-0.1,0,10)),
+        ?assertEqual({error,"Invalid probability"}, invcdf(1.1,0,10)).
 
 -endif.
