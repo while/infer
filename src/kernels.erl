@@ -10,6 +10,7 @@
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
+-define(assertEqualDigits(X,Y,D), ?assert(abs((X)-(Y)) < math:pow(10,-(D)))).
 -endif.
 
 % ------------------------------------------------------------------------------
@@ -51,6 +52,12 @@ tricube(X) ->
 % ------------------------------------------------------------------------------
 triangular(X) ->
         (1-abs(X))*i(X).
+
+% ------------------------------------------------------------------------------
+%  Cosine Kernel
+% ------------------------------------------------------------------------------
+cosine(X) ->
+       0.7853981633974483*math:cos(1.570796326794897*X)*i(X).
 
 
 % ==============================================================================
@@ -104,5 +111,13 @@ triangular_test() ->
         ?assertEqual(0.5, triangular(-0.5)),
         ?assertEqual(0.0, triangular(10.0)),
         ?assertEqual(0.0, triangular(-1.01)).
+
+cosine_test() ->
+        ?assertEqualDigits(0.0, cosine(1.0), 14),
+        ?assertEqual(0.7853981633974483, cosine(0.0)),
+        ?assertEqual(0.5553603672697957, cosine(0.5)),
+        ?assertEqual(0.5553603672697957, cosine(-0.5)),
+        ?assertEqual(0.0, cosine(10.0)),
+        ?assertEqual(0.0, cosine(-1.01)).
 
 -endif.
