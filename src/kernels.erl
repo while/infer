@@ -3,7 +3,7 @@
 % ==============================================================================
 -module(kernels).
 
--export([boxcar/1, gaussian/1, epanechnikov/1, tricube/1]).
+-export([boxcar/1, gaussian/1, epanechnikov/1, tricube/1, triangular/1]).
 
 -define(SQR(X), ((X)*(X))).
 -define(CUBE(X), ((X)*(X)*(X))).
@@ -25,18 +25,19 @@ boxcar(X) ->
         0.5*i(X).
 
 
-
 % ------------------------------------------------------------------------------
 %  Gaussian Kernel
 % ------------------------------------------------------------------------------
 gaussian(X) ->
         0.398942280401432678*math:exp(-0.5*?SQR(X)).
 
+
 % ------------------------------------------------------------------------------
 %  Epanechnikov Kernel
 % ------------------------------------------------------------------------------
 epanechnikov(X) ->
         0.75*(1-?SQR(X))*i(X).
+
 
 % ------------------------------------------------------------------------------
 %  Tricube Kernel
@@ -76,5 +77,14 @@ gaussian_test() ->
         ?assertEqual(0.3520653267642995, gaussian(-0.5)),
         ?assertEqual(7.69459862670642e-23, gaussian(10.0)),
         ?assertEqual(0.23955109772801336, gaussian(-1.01)).
+
+epanechnikov_test() ->
+        ?assertEqual(0.0, epanechnikov(1.0)),
+        ?assertEqual(0.75, epanechnikov(0.0)),
+        ?assertEqual(0.5625, epanechnikov(0.5)),
+        ?assertEqual(0.5625, epanechnikov(-0.5)),
+        ?assertEqual(0.0, epanechnikov(10.0)),
+        ?assertEqual(0.0, epanechnikov(-1.01)).
+
 
 -endif.
