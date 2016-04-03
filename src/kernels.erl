@@ -97,4 +97,12 @@ tricube_test() ->
         ?assertEqual(0.0, tricube(10.0)),
         ?assertEqual(0.0, tricube(-1.01)).
 
+triangular_test() ->
+        ?assertEqual(0.0, triangular(1.0)),
+        ?assertEqual(1.0, triangular(0.0)),
+        ?assertEqual(0.5, triangular(0.5)),
+        ?assertEqual(0.5, triangular(-0.5)),
+        ?assertEqual(0.0, triangular(10.0)),
+        ?assertEqual(0.0, triangular(-1.01)).
+
 -endif.
