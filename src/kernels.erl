@@ -61,12 +61,14 @@ triangular(X) ->
 indicator_test() ->
         ?assertEqual(1.0, i(1.0)),
         ?assertEqual(1.0, i(0.0)),
+        ?assertEqual(1.0, i(0.5)),
         ?assertEqual(1.0, i(-0.5)),
         ?assertEqual(0.0, i(10.0)).
 
 boxcar_test() ->
         ?assertEqual(0.5, boxcar(1.0)),
         ?assertEqual(0.5, boxcar(0.0)),
+        ?assertEqual(0.5, boxcar(0.5)),
         ?assertEqual(0.5, boxcar(-0.5)),
         ?assertEqual(0.0, boxcar(10.0)),
         ?assertEqual(0.0, boxcar(-1.01)).
@@ -74,6 +76,7 @@ boxcar_test() ->
 gaussian_test() ->
         ?assertEqual(0.24197072451914337, gaussian(1.0)),
         ?assertEqual(0.3989422804014327, gaussian(0.0)),
+        ?assertEqual(0.3520653267642995, gaussian(0.5)),
         ?assertEqual(0.3520653267642995, gaussian(-0.5)),
         ?assertEqual(7.69459862670642e-23, gaussian(10.0)),
         ?assertEqual(0.23955109772801336, gaussian(-1.01)).
@@ -86,5 +89,12 @@ epanechnikov_test() ->
         ?assertEqual(0.0, epanechnikov(10.0)),
         ?assertEqual(0.0, epanechnikov(-1.01)).
 
+tricube_test() ->
+        ?assertEqual(0.0, tricube(1.0)),
+        ?assertEqual(70/81, tricube(0.0)),
+        ?assertEqual(0.5789448302469136, tricube(0.5)),
+        ?assertEqual(0.5789448302469136, tricube(-0.5)),
+        ?assertEqual(0.0, tricube(10.0)),
+        ?assertEqual(0.0, tricube(-1.01)).
 
 -endif.
